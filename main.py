@@ -2,7 +2,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from youtube_audio import download_audio
-from whisper_stt import transcribe_audio
+from whisper_stt import transcribe
+from subtitle_utils import save_srt, translate_srt, srt_to_tts
 
 def main():
     # 1) .env 로드(OPENAI_API_KEY)
@@ -21,15 +22,15 @@ def main():
         raise FileNotFoundError(f"음성 파일이 생성되지 않았습니다: {audio_path}")
 
     # 4) Whisper STT
-    text = transcribe_audio(str(audio_path))
+    result = transcribe(str(audio_path))
 
     # 5) 출력 폴더 생성 + 저장
     out_dir = Path("output") / "subtitles"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = out_dir / "result.txt"
-    output_file.write_text(text, encoding="utf-8")
-
+    output_file.write_text(result.text, encoding="utf-8")
+  
     print("자막 파일 생성 완료:", output_file)
 
 if __name__ == "__main__":

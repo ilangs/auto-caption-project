@@ -2,7 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from youtube_audio import download_audio
-from whisper_stt import transcribe_audio
+from whisper_stt import transcribe
 
 def transcribe_in_chunks(chunk_dir: Path) -> str:
     parts = sorted(chunk_dir.glob("part_*.mp3"))
@@ -12,7 +12,7 @@ def transcribe_in_chunks(chunk_dir: Path) -> str:
     texts = []
     for i, p in enumerate(parts, start=1):
         print(f"[{i}/{len(parts)}] STT 처리 중: {p.name}")
-        texts.append(transcribe_audio(str(p)))
+        texts.append(transcribe(str(p)))
     return "\n".join(texts)
 
 def main():
@@ -35,9 +35,9 @@ def main():
         text = transcribe_in_chunks(chunk_dir)
     else:
         # 분할 폴더가 없으면 단일 파일 STT 시도
-        text = transcribe_audio(str(audio_path))
+        result = transcribe(str(audio_path))
 
-    output_file.write_text(text, encoding="utf-8")
+    output_file.write_text(result.text, encoding="utf-8")
     print("자막 파일 생성 완료:", output_file)
 
 if __name__ == "__main__":
